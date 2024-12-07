@@ -131,11 +131,15 @@ lebron_shots <- shots |>
 
 ```
 
+
+
 # A Rookie’s first shot
 
 LeBron James’ first-ever NBA shot was a mid-range jumper, 16 feet from the basket, in his debut game against the Sacramento Kings.
 
-```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's visit ever NBA game on Oct. 10, 2003. The league was a different world. Post-play dominated, and three-point shots were reserved for specialists."}
+
+
+```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's visit ever NBA game on Oct. 10, 2003"}
 # Creating a basic shot chart for Lebron's 1st NBA shot
 
 # Filter for Lebron's first gameshots and scale the x and y coordinates
@@ -183,6 +187,10 @@ first_shot_chart_draft
 
 ```
 
+
+
+The year was 2003, and the league was a different world—post-play dominated, and three-point shots were reserved for specialists.
+
 ::: {.callout-caution collapse="true"}
 ## Video of Lebron's 1st shot in the NBA
 
@@ -194,6 +202,8 @@ first_shot_chart_draft
 :::
 
 Fast forward 20 years, and LeBron, the NBA’s all-time leading scorer, has transformed his game. His shot selection now reflects the modern league: fast-paced, 3PT-heavy, and analytics-driven.
+
+
 
 ```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap=" 20 years later on Oct. 10, 2023, LeBron's shots selection chart, looks like this"}
 
@@ -244,7 +254,11 @@ twenty_year_shot_chart_draft
 
 ```
 
+
+
 This is the story of how LeBron’s shot selection evolved, and what it reveals about the NBA’s metamorphosis.
+
+
 
 ```{r}
 
@@ -305,8 +319,11 @@ ggplot(lebron_two_games, aes(x = as.factor(dateGame), y = percentage, group = co
   )
 ```
 
+
+
 # Sources:
 
 Lebron collage image on title banner: <https://www.highlandmint.com/products/lebron-james-nba-all-time-leading-scorer-through-the-years-bronze-coin-photo-mint>
 
 Lebron's 1st shot: <https://youtube.com/shorts/ZhxMwCLSNnc?si=l89alP6ZODIdloPB>
+
