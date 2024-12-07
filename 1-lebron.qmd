@@ -1,0 +1,255 @@
+---
+title: <span style="color:white">The Evolution of LeBron's Shot Choices (2003–2023)</span>
+subtitle: "How the King’s shot selection mirrors the NBA’s transformation"
+
+author: 
+- name: "King Matayo"
+  email: kingmatayo.thefirst@gmail.com
+date: 12/07/2024
+
+title-block-banner: ./assets/lebron-collage.jpg
+title-block-banner-color: "black"
+
+format: html
+html:
+code-fold: false
+code-summary: "Code"
+echo: false
+css: style.css
+toc: true
+toc-location: left
+number-sections: false
+editor: visual
+fig-cap-location: margin
+---
+
+```{r warning=FALSE, message=FALSE}
+
+# Load required libraries
+library(tidyverse)
+library(BasketballAnalyzeR)
+library(nbastatR)
+library(ggimage)
+library(cropcircles)
+library(ggtext)
+library(glue)
+library(janitor)
+library(htmltools)
+library(gganimate)
+
+
+
+```
+
+```{r warning=FALSE, message=FALSE, include=FALSE, output=FALSE}
+# Acquire data,wrangle, and filter
+
+# Increase connection size for handling large datasets
+
+Sys.setenv(VROOM_CONNECTION_SIZE = 500072)
+
+# The goal here it to get shot data for all LBJ teams from 2003 to 2024
+
+# Using a for-loop for each team and season lebron played in
+
+# Team 1: Starting with the Cleveland Cavaliers
+
+# Initialize an empty list to store shot data for each season
+all_shots_cc <- list()
+
+# Loop through each season from 2003 to 2010
+for (season in 2003:2010) {
+  # Fetch shot data for the current season
+  season_shots_cc <- teams_shots(team_ids = 1610612739, seasons = season)
+  
+  # Append the data to the list
+  all_shots_cc[[as.character(season)]] <- season_shots_cc
+}
+
+# Combine all cav seasons data into a single data frame
+shots_cc <- bind_rows(all_shots_cc)
+
+# Team 2: Miami Heat
+all_shots_mh <- list()
+
+# Loop through each season from 2003 to 2010
+for (season in 2011:2014) {
+  # Fetch shot data for the current season
+  season_shots_mh <- teams_shots(team_ids = 1610612748, seasons = season)
+  
+  # Append the data to the list
+  all_shots_mh[[as.character(season)]] <- season_shots_mh
+}
+
+# Combine all miami seasons data into a single data frame
+shots_mh <- bind_rows(all_shots_mh)
+
+# Team 3: Back to the Cavs
+
+# Initialize an empty list to store shot data for each season
+all_shots_cc2 <- list()
+
+# Loop through each season from 2015 to 2018
+for (season in 2015:2018) {
+  # Fetch shot data for the current season
+  season_shots_cc2 <- teams_shots(team_ids = 1610612739, seasons = season)
+  
+  # Append the data to the list
+  all_shots_cc2[[as.character(season)]] <- season_shots_cc2
+}
+
+# Combine all cavs seasons data into a single data frame
+shots_cc2 <- bind_rows(all_shots_cc2)
+
+# Team 4/Current Team: The LosAngeles Lakers
+
+# Initialize an empty list to store shot data for each season
+all_shots_ll <- list()
+
+# Loop through each season from 2019 to 2024
+for (season in 2019:2024) {
+  # Fetch shot data for the current season
+  season_shots_ll <- teams_shots(team_ids = 1610612747, seasons = season)
+  
+  # Append the data to the list
+  all_shots_ll[[as.character(season)]] <- season_shots_ll
+}
+
+# Combine all laker seasons data into a single data frame
+shots_ll <- bind_rows(all_shots_ll)
+
+# Combine all shots data frames above into one main data frame (to rule them all, haha)
+shots <- rbind(shots_cc, shots_mh, shots_cc2, shots_ll)
+
+# Filter only LeBron James' shots
+lebron_shots <- shots |>
+  filter(namePlayer == "LeBron James") |>
+  mutate(season = as.factor(yearSeason))  # Add a season column
+
+
+
+
+```
+
+# A Rookie’s first shot
+
+LeBron James’ first-ever NBA shot was a mid-range jumper, 16 feet from the basket, in his debut game against the Sacramento Kings.
+
+```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's visit ever NBA game on Oct. 10, 2003"}
+# Creating a basic shot chart for Lebron's 1st NBA shot
+
+# Filter for Lebron's first gameshots and scale the x and y coordinates
+first_game_shots <- lebron_shots |>
+  # First game
+  filter(dateGame == 20031029) |>
+  # Scale x and y coordinates (court dimensions adjusted manually)
+  mutate(x = (locationX / 10) - 0,
+         y = (locationY / 10) - 41.75) |>
+  # Remove shots from beyond half-court range
+  filter(y < 0) |> 
+  mutate(
+  # Categorize shots based on distance from the basket
+  court_zone = case_when(
+    distanceShot <= 8 ~ "Paint",               # Shots close to the basket
+    distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
+    distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
+    TRUE ~ "Other"                            # Catch-all for undefined cases
+  )
+)
+
+# Summarize the shots data by courtzone
+# Group by court zone, then summarize frequencies
+
+first_lebron_summary <- first_game_shots |>
+  group_by(court_zone) |>
+  summarize(shots_by_zone = n(), .groups = "drop") |>
+  mutate(
+    all_shots = sum(shots_by_zone),  # Calculate overall shots per season
+    percentage = (shots_by_zone / all_shots) * 100  # Calculate percentage by court zone
+  ) |>
+  ungroup()
+
+  
+
+first_shot_chart_draft <- 
+  # draws the NBA half court
+  BasketballAnalyzeR::drawNBAcourt(
+  ggplot(data = first_game_shots), size = 0.5, col = "grey20") +
+  
+  # shot data
+  geom_point(aes(x = x, y = y, fill = court_zone), shape = 21, color = "white", size = 2.5, alpha = 0.8)
+
+first_shot_chart_draft
+
+```
+
+The year was 2003, and the league was a different world—post-play dominated, and three-point shots were reserved for specialists.
+
+::: {.callout-caution collapse="true"}
+## Video of Lebron's 1st shot in the NBA
+
+{{< video ./assets/first-shot.mp4
+  title="Lebron's first shot"
+    end="5"
+    aspect-ratio="6x3"
+>}}
+:::
+
+Fast forward 20 years, and LeBron, the NBA’s all-time leading scorer, has transformed his game. His shot selection now reflects the modern league: fast-paced, 3PT-heavy, and analytics-driven.
+
+```{r}
+
+# Creating a basic shot chart for Lebron's NBA shot choices, 20 years later
+
+# Filter for Lebron's gameshots on Dec. 10, 2023 and scale the x and y coordinates
+twenty_year_game_shots <- lebron_shots |>
+  # First game
+  filter(dateGame == 20231029) |>
+  # Scale x and y coordinates (court dimensions adjusted manually)
+  mutate(x = (locationX / 10) - 0,
+         y = (locationY / 10) - 41.75) |>
+  # Remove shots from beyond half-court range
+  filter(y < 0) |> 
+  mutate(
+  # Categorize shots based on distance from the basket
+  court_zone = case_when(
+    distanceShot <= 8 ~ "Paint",               # Shots close to the basket
+    distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
+    distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
+    TRUE ~ "Other"                            # Catch-all for undefined cases
+  )
+)
+
+# Summarize the shots data by courtzone
+# Group by court zone, then summarize frequencies
+
+twenty_lebron_summary <- twenty_year_game_shots |>
+  group_by(court_zone) |>
+  summarize(shots_by_zone = n(), .groups = "drop") |>
+  mutate(
+    all_shots = sum(shots_by_zone),  # Calculate overall shots per season
+    percentage = (shots_by_zone / all_shots) * 100  # Calculate percentage by court zone
+  ) |>
+  ungroup()
+
+  
+
+twenty_year_shot_chart_draft <- 
+  # draws the NBA half court
+  BasketballAnalyzeR::drawNBAcourt(
+  ggplot(data = twenty_year_game_shots), size = 0.5, col = "grey20") +
+  
+  # shot data
+  geom_point(aes(x = x, y = y, fill = court_zone), shape = 21, color = "white", size = 2.5, alpha = 0.8)
+
+twenty_year_shot_chart_draft
+
+```
+
+This is the story of how LeBron’s shot selection evolved, and what it reveals about the NBA’s metamorphosis.
+
+# Sources:
+
+Lebron collage image on title banner: <https://www.highlandmint.com/products/lebron-james-nba-all-time-leading-scorer-through-the-years-bronze-coin-photo-mint>
+
+Lebron's 1st shot: <https://youtube.com/shorts/ZhxMwCLSNnc?si=l89alP6ZODIdloPB>
