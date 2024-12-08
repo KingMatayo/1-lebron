@@ -141,11 +141,61 @@ ggplot(lebron_two_games, aes(x = as.factor(dateGame), y = percentage, group = co
 
 In his early years, LeBron relied heavily on his unmatched athleticism. Most of his shots came from the paint, where he dominated defenders with explosive drives and finishes at the rim.
 
-```{r}
+```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
-# Since this is time-series data - Recreate line chart i did before, but this time make it animated with gganimate
+# Since this is time-series data - Recreate heatmap or line chart i did before, but this time make it animated with gganimate
+
+# Define zones based on shot locations
+lebron_2003_2008 <- lebron_shots |>
+  filter(season >= 2003 & season <= 2008) |>
+  # Scale x and y coordinates (court dimensions adjusted manually)
+  mutate(x = (locationX / 10) - 0,
+         y = (locationY / 10) - 41.75) |>
+  mutate(
+    # Categorize shots based on distance from the basket
+    court_zone = case_when(
+      distanceShot <= 8 ~ "Paint",               # Shots close to the basket
+      distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
+      distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
+      TRUE ~ "Other"                            # Catch-all for undefined cases
+    )
+  )
+
+# Group by season and court zone, then summarize frequencies
+
+lebron_summary_03_08 <- lebron_2003_2008 |>
+  group_by(season, court_zone) |>
+  summarize(total_shots = n(), .groups = "drop") |>
+  group_by(season) |>
+  mutate(
+    overall_shots = sum(total_shots),  # Calculate overall shots per season
+    percentage = (total_shots / overall_shots) * 100  # Calculate percentage by court zone
+  ) |>
+  ungroup()
+
+# Linechart to show shot preferences over time
+lebron_linechart_03_08 <- ggplot(lebron_summary_03_08, aes(x = season, y = percentage, color = court_zone, group = court_zone)) +
+  geom_line(linewidth=1) +
+  geom_point(size = 2)  +
+  # Animation: One frame per season
+  transition_reveal(season) +
+  labs(
+    title = "LeBron James % of Shot Choices by Court Zone and by Season (2003-08)",
+    x = "Season",
+    y = "% of Shots",
+    color = "Court Zone"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Save the animation
+anim_save("./assets/lebron_linechart_03_08.gif", lebron_linechart_03_08)
 
 ```
+
+![LeBron's shot choices (2003-08)](assets/lebron_linechart_03_08.gif)
+
+Between 2003 and 2008, over **40% of LeBron’s shots came from the paint**, with mid-range jumpers making up the second-largest proportion. **Threes were an afterthought**, comprising less than 15% of his attempts.
 
 # Sources:
 
