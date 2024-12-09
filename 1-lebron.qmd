@@ -36,6 +36,8 @@ library(glue)
 library(janitor)
 library(htmltools)
 library(gganimate)
+library(viridis)
+
 
 # Source functions
 source(file="./R/00-functions.R")
@@ -77,52 +79,13 @@ create_shotchart(all_shots,"LeBron James",20231029)
 This is the story of how LeBron’s shot selection evolved, and what it reveals about the NBA’s metamorphosis.
 
 ```{r}
-# Read csv file with all Lebron's shots data from 2003 to 2024
-lebron_shots <- read.csv("./data/lebron-shots-2003-2024.csv")
 
-# Filter data for the two games
-lebron_two_games <- lebron_shots |>
-  filter(dateGame %in% c("20031029", "20231029")) |>
-  # Scale x and y coordinates (court dimensions adjusted manually)
-  mutate(x = (locationX / 10) - 0,
-         y = (locationY / 10) - 41.75) |>
-  # Remove shots from beyond half-court range
-  filter(y < 0) |> 
-  mutate(
-  # Categorize shots based on distance from the basket
-  court_zone = case_when(
-    distanceShot <= 8 ~ "Paint",               # Shots close to the basket
-    distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
-    distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
-    TRUE ~ "Other"                            # Catch-all for undefined cases
-  )) |> 
-  group_by(dateGame, court_zone) |>
-  summarize(total_shots_two_games = n(), .groups = "drop") |>
-  group_by(dateGame) |>
-  mutate(
-    all_shots_two_games = sum(total_shots_two_games),
-    percentage = (total_shots_two_games / all_shots_two_games) * 100
-  ) |>
-  ungroup()
+# Generate's Lebron's slope chart with the function created
+base_lebron_slope_chart <- shots_game_by_game_slope_chart(all_shots,"LeBron James",20031029,20231029)
 
-# Add label positions: midpoint between start and end points
-label_positions <- lebron_two_games |>
-  group_by(court_zone) |>
-  summarize(
-    x_pos = mean(as.numeric(as.factor(dateGame))),  # Midpoint of x positions
-    y_pos = mean(percentage),                      # Average percentage for the label
-    .groups = "drop"
-  )
-
-# Create a slope chart. FYI-> "Mid-Range" = "#50C878"
-ggplot(lebron_two_games, aes(x = as.factor(dateGame), y = percentage, group = court_zone, color = court_zone)) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 3) +
-  geom_text(data = label_positions, aes(x = x_pos, y = y_pos, label = court_zone, hjust= 0.1, vjust=1 ), size = 4, show.legend = FALSE) +
-  scale_x_discrete(labels = c("20031029" = "October 29, 2003", "20231029" = "October 29, 2023")) +
-  scale_color_manual(
-    values = c("Paint" = "#99CCFF", "Mid-Range" = "#50C878", "3PT" = "#FF9999")
-  ) +
+# Style it abit
+base_lebron_slope_chart +
+  scale_x_discrete(labels = c("20031029" = "October 29, 2003", "20231029" = "October 29, 2023")) + 
   labs(
     title = "LeBron's shot choices: Oct. 29, 2003 vs. 2023",
     subtitle = "His 3PT attempts went up from 5% to 42% of all shot choices",
@@ -144,6 +107,8 @@ In his early years, LeBron relied heavily on his unmatched athleticism. Most of 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
 # Since this is time-series data - Recreate heatmap or line chart i did before, but this time make it animated with gganimate
+# Read csv file with all NBA shots data from 2003 to 2024
+lebron_shots <- read.csv("./data/lebron-shots-2003-2024.csv")
 
 # Define zones based on shot locations
 lebron_2003_2008 <- lebron_shots |>
@@ -190,6 +155,26 @@ lebron_linechart_03_08 <- ggplot(lebron_summary_03_08, aes(x = season, y = perce
 
 # Save the animation
 # anim_save("./assets/lebron_linechart_03_08.gif", lebron_linechart_03_08)
+
+# Testing function
+
+base_lebron_linechart <- create_linechart(all_shots,"LeBron James",2003,2008)
+
+lebron_linechart_03_08_v2 <- base_lebron_linechart +
+  # Animation: reveal a path per season
+  transition_reveal(season) +
+  labs(
+    title = "LeBron James % of Shot Choices by Court Zone and by Season (2003-08)",
+    x = "Season",
+    y = "% of Shots",
+    color = "Court Zone"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Save the animation
+# anim_save("./assets/lebron_linechart_03_08_v2.gif", lebron_linechart_03_08_v2)
+
 
 ```
 
