@@ -48,7 +48,7 @@ source(file="./R/00-functions.R")
 
 LeBron James’ first-ever NBA shot was a mid-range jumper, 16 feet from the basket, in his debut game against the Sacramento Kings.
 
-```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's visit ever NBA game on Oct. 29, 2003. The league was a different world. Post-play dominated, and three-point shots were reserved for specialists."}
+```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's first ever NBA game on Oct. 29, 2003. The league was a different world. Post-play dominated, and three-point shots were reserved for specialists."}
 
 # Read csv file with all NBA shots data from 2003 to 2024
 all_shots <- read.csv("./data/allshots-2003-2024.csv")
@@ -62,9 +62,9 @@ create_shotchart(all_shots,"LeBron James",20031029)
 ```
 
 ::: {.callout-caution collapse="true"}
-## Video of Lebron's 1st shot in the NBA
+## Highlights video of Lebron's 1st game in the NBA
 
-{{< video ./assets/first-shot.mp4 title="Lebron's first shot" end="5" aspect-ratio="6x3" >}}
+{{< video https://youtu.be/JLjH0rrNFeU?si=GvWpreT5fzQRXjiI title="Lebron's first shot" end="5" aspect-ratio="6x3" >}}
 :::
 
 Fast forward 20 years, and LeBron, the NBA’s all-time leading scorer, has transformed his game. His shot selection now reflects the modern league: fast-paced, 3PT-heavy, and analytics-driven.
@@ -76,11 +76,17 @@ Fast forward 20 years, and LeBron, the NBA’s all-time leading scorer, has tran
 create_shotchart(all_shots,"LeBron James",20231029)
 ```
 
+::: {.callout-caution collapse="true"}
+## Highlights video of Lebron's game, 20 years later, on Oct. 29, 2023
+
+{{< video https://youtu.be/vmkklIxhE3Y?si=HA6_CuHiUA4yudT9 title="Lebron's first shot" end="5" aspect-ratio="6x3" >}}
+:::
+
 This is the story of how LeBron’s shot selection evolved, and what it reveals about the NBA’s metamorphosis.
 
 ```{r}
 
-# Generate's Lebron's slope chart with the function created
+# Generate's Lebron's slope chart with the slope chart generating function created
 base_lebron_slope_chart <- shots_game_by_game_slope_chart(all_shots,"LeBron James",20031029,20231029)
 
 # Style it abit
@@ -106,63 +112,13 @@ In his early years, LeBron relied heavily on his unmatched athleticism. Most of 
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
-# Since this is time-series data - Recreate heatmap or line chart i did before, but this time make it animated with gganimate
-# Read csv file with all NBA shots data from 2003 to 2024
-lebron_shots <- read.csv("./data/lebron-shots-2003-2024.csv")
+# Since this is time-series data - use a custom function to create a line chart - as i did before, but this time make it animated with gganimate
 
-# Define zones based on shot locations
-lebron_2003_2008 <- lebron_shots |>
-  filter(season > 2002 & season <= 2008) |>
-  # Scale x and y coordinates (court dimensions adjusted manually)
-  mutate(x = (locationX / 10) - 0,
-         y = (locationY / 10) - 41.75) |>
-  mutate(
-    # Categorize shots based on distance from the basket
-    court_zone = case_when(
-      distanceShot <= 8 ~ "Paint",               # Shots close to the basket
-      distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
-      distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
-      TRUE ~ "Other"                            # Catch-all for undefined cases
-    )
-  )
+base_lebron_linechart_03_08 <- create_linechart(all_shots,"LeBron James",2003,2008)
 
-# Group by season and court zone, then summarize frequencies
-
-lebron_summary_03_08 <- lebron_2003_2008 |>
-  group_by(season, court_zone) |>
-  summarize(total_shots = n(), .groups = "drop") |>
-  group_by(season) |>
-  mutate(
-    overall_shots = sum(total_shots),  # Calculate overall shots per season
-    percentage = (total_shots / overall_shots) * 100  # Calculate percentage by court zone
-  ) |>
-  ungroup()
-
-# Linechart to show shot preferences over time
-lebron_linechart_03_08 <- ggplot(lebron_summary_03_08, aes(x = season, y = percentage, color = court_zone, group = court_zone)) +
-  geom_line(linewidth=1) +
-  geom_point(size = 2)  +
+lebron_linechart_03_08_v2 <- base_lebron_linechart_03_08 +
   # Animation: reveal a path per season
-  transition_reveal(season) +
-  labs(
-    title = "LeBron James % of Shot Choices by Court Zone and by Season (2003-08)",
-    x = "Season",
-    y = "% of Shots",
-    color = "Court Zone"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Save the animation
-# anim_save("./assets/lebron_linechart_03_08.gif", lebron_linechart_03_08)
-
-# Testing function
-
-base_lebron_linechart <- create_linechart(all_shots,"LeBron James",2003,2008)
-
-lebron_linechart_03_08_v2 <- base_lebron_linechart +
-  # Animation: reveal a path per season
-  transition_reveal(season) +
+  transition_reveal(yearSeason) +
   labs(
     title = "LeBron James % of Shot Choices by Court Zone and by Season (2003-08)",
     x = "Season",
@@ -178,7 +134,7 @@ lebron_linechart_03_08_v2 <- base_lebron_linechart +
 
 ```
 
-![LeBron's shot choices (2003-08)](assets/lebron_linechart_03_08.gif)
+![LeBron's shot choices (2003-08)](assets/lebron_linechart_03_08_v2.gif)
 
 Between 2003 and 2008, over **40% of LeBron’s shots came from the paint**, with mid-range jumpers making up the second-largest proportion. **Threes were an afterthought**, comprising less than 15% of his attempts.
 
@@ -187,40 +143,11 @@ Between 2003 and 2008, over **40% of LeBron’s shots came from the paint**, wit
 As LeBron’s game matured, so did his shooting repertoire. His time in Miami (2010–2014) marked a critical turning point. Working alongside sharpshooters like Ray Allen and under the analytical tutelage of Erik Spoelstra, LeBron began integrating the three-point shot into his arsenal
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
-# Define zones based on shot locations
-lebron_2009_2015 <- lebron_shots |>
-  filter(season >= 2009 & season <= 2015) |>
-  # Scale x and y coordinates (court dimensions adjusted manually)
-  mutate(x = (locationX / 10) - 0,
-         y = (locationY / 10) - 41.75) |>
-  mutate(
-    # Categorize shots based on distance from the basket
-    court_zone = case_when(
-      distanceShot <= 8 ~ "Paint",               # Shots close to the basket
-      distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
-      distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
-      TRUE ~ "Other"                            # Catch-all for undefined cases
-    )
-  )
+base_lebron_linechart_09_15 <- create_linechart(all_shots,"LeBron James",2009,2015)
 
-# Group by season and court zone, then summarize frequencies
-
-lebron_summary_09_15 <- lebron_2009_2015 |>
-  group_by(season, court_zone) |>
-  summarize(total_shots = n(), .groups = "drop") |>
-  group_by(season) |>
-  mutate(
-    overall_shots = sum(total_shots),  # Calculate overall shots per season
-    percentage = (total_shots / overall_shots) * 100  # Calculate percentage by court zone
-  ) |>
-  ungroup()
-
-# Linechart to show shot preferences over time
-lebron_linechart_09_15 <- ggplot(lebron_summary_09_15, aes(x = season, y = percentage, color = court_zone, group = court_zone)) +
-  geom_line(linewidth=1) +
-  geom_point(size = 2)  +
+lebron_linechart_09_15_v2 <- base_lebron_linechart_09_15 +
   # Animation: reveal a path per season
-  transition_reveal(season) +
+  transition_reveal(yearSeason) +
   labs(
     title = "LeBron James % of Shot Choices by Court Zone and by Season (2009-15)",
     x = "Season",
@@ -231,11 +158,11 @@ lebron_linechart_09_15 <- ggplot(lebron_summary_09_15, aes(x = season, y = perce
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Save the animation
-#anim_save("./assets/lebron_linechart_09_15.gif", lebron_linechart_09_15)
+# anim_save("./assets/lebron_linechart_09_15_v2.gif", lebron_linechart_09_15_v2)
 
 ```
 
-![Lebron's shot choices (2009-15)](assets/lebron_linechart_09_15.gif)
+![Lebron's shot choices (2009-15)](assets/lebron_linechart_09_15_v2.gif)
 
 From 2009 to 2015:
 
@@ -253,40 +180,11 @@ The modern NBA is a three-point shooter’s paradise, and even LeBron has adapte
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
-# Define zones based on shot locations
-lebron_2016_2024 <- lebron_shots |>
-  filter(season >= 2016 & season <= 2024) |>
-  # Scale x and y coordinates (court dimensions adjusted manually)
-  mutate(x = (locationX / 10) - 0,
-         y = (locationY / 10) - 41.75) |>
-  mutate(
-    # Categorize shots based on distance from the basket
-    court_zone = case_when(
-      distanceShot <= 8 ~ "Paint",               # Shots close to the basket
-      distanceShot > 8 & distanceShot < 23 ~ "Mid-Range",  # Shots outside the paint but inside the 3PT line
-      distanceShot >= 23 ~ "3PT",                # Shots beyond the 3-point line
-      TRUE ~ "Other"                            # Catch-all for undefined cases
-    )
-  )
+base_lebron_linechart_16_24 <- create_linechart(all_shots,"LeBron James",2016,2024)
 
-# Group by season and court zone, then summarize frequencies
-
-lebron_summary_16_24 <- lebron_2016_2024 |>
-  group_by(season, court_zone) |>
-  summarize(total_shots = n(), .groups = "drop") |>
-  group_by(season) |>
-  mutate(
-    overall_shots = sum(total_shots),  # Calculate overall shots per season
-    percentage = (total_shots / overall_shots) * 100  # Calculate percentage by court zone
-  ) |>
-  ungroup()
-
-# Linechart to show shot preferences over time
-lebron_linechart_16_24 <- ggplot(lebron_summary_16_24, aes(x = season, y = percentage, color = court_zone, group = court_zone)) +
-  geom_line(linewidth=1) +
-  geom_point(size = 2)  +
+lebron_linechart_16_24_v2 <- base_lebron_linechart_16_24 +
   # Animation: reveal a path per season
-  transition_reveal(season) +
+  transition_reveal(yearSeason) +
   labs(
     title = "LeBron James % of Shot Choices by Court Zone and by Season (2016-24)",
     x = "Season",
@@ -297,12 +195,12 @@ lebron_linechart_16_24 <- ggplot(lebron_summary_16_24, aes(x = season, y = perce
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Save the animation
-anim_save("./assets/lebron_linechart_16_24.gif", lebron_linechart_16_24)
+anim_save("./assets/lebron_linechart_16_24_v2.gif", lebron_linechart_16_24_v2)
 
 
 ```
 
-![LeBron's shot choices (2016-2024)](assets/lebron_linechart_16_24.gif)
+![LeBron's shot choices (2016-2024)](assets/lebron_linechart_16_24_v2.gif)
 
 The shift isn't just about LeBron. The NBA's average number of three-point attempts per game has more than doubled since his rookie year. The league has transitioned from a post-centric style to a perimeter-oriented game.
 
