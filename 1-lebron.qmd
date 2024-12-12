@@ -42,50 +42,47 @@ library(viridis)
 # Source functions
 source(file="./R/00-functions.R")
 
+# Read csv file with all NBA shots data from 2003 to 2024
+all_shots <- read.csv("./data/allshots-2003-2024.csv")
+
 ```
 
 # A rookie’s first shot
 
-LeBron James’ first-ever NBA shot was a mid-range jumper, 16 feet from the basket, in his debut game against the Sacramento Kings.
+In my experience, the simplest decisions often reveal the most about who we are, at any given point in time.
 
-```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap="Shots selection chart of Lebron's first ever NBA game on Oct. 29, 2003. The league was a different world. Post-play dominated, and three-point shots were reserved for specialists."}
+On October 29, 2003, 18-year-old LeBron James made his first shot decision as an NBA player. It wasn’t a flashy dunk or a deep three. It was a mid-range jumper - plain, efficient, unremarkable. Two points.
 
-# Read csv file with all NBA shots data from 2003 to 2024
-all_shots <- read.csv("./data/allshots-2003-2024.csv")
+::: column-margin
+[LeBron's 1st NBA Game: October 29, 2003](https://youtu.be/JLjH0rrNFeU?si=R5YavOwTrWUNfcZ2){target="_blank"}
+:::
 
+But that single shot spoke volumes. It told us what basketball was in 2003: a game that valued size and strength, rewarded mid-range specialists, and treated the three-point line as an occasional luxury.
 
+Fast forward 20 years, and that same decision would look out of place. Today’s NBA is unrecognizable. Three-pointers aren’t just common - they’re necessary. Mid-range shots are now basketball’s version of a landline phone: technically still around, but rarely used.
+
+LeBron’s first shot wasn’t just the start of his career. It was a snapshot of a moment in time. And what’s fascinating is how his evolution mirrors the evolution of the league itself. His choices on the court became a masterclass in adaptation.
+
+This is the story of how LeBron’s shot selection changed over two decades, and how those choices reflect the shifting forces that reshaped the game of basketball.
+
+::: {.panel-tabset .nav-pills}
+## LeBron's first NBA game chart
+
+```{r warning=FALSE, message=FALSE}
 # Creating a basic shot chart for Lebron's 1st NBA shot
 
 create_shotchart(all_shots,"LeBron James",20031029)
-
-
 ```
 
-::: {.callout-caution collapse="true"}
-## Highlights video of Lebron's 1st game in the NBA
+## 20 years later
 
-{{< video https://youtu.be/JLjH0rrNFeU?si=GvWpreT5fzQRXjiI title="Lebron's first shot" end="5" aspect-ratio="6x3" >}}
-:::
-
-Fast forward 20 years, and LeBron, the NBA’s all-time leading scorer, has transformed his game. His shot selection now reflects the modern league: fast-paced, 3PT-heavy, and analytics-driven.
-
-```{r warning=FALSE, message=FALSE,fig.align='center',fig.cap=" 20 years later on Oct. 29, 2023, LeBron's shots selection chart, looks like this"}
-
-# Creating a basic shot chart for Lebron's NBA shot choices, 20 years later
-
+```{r warning=FALSE, message=FALSE}
 create_shotchart(all_shots,"LeBron James",20231029)
 ```
 
-::: {.callout-caution collapse="true"}
-## Highlights video of Lebron's game, 20 years later, on Oct. 29, 2023
+## Comparison: 2003 vs 2023
 
-{{< video https://youtu.be/vmkklIxhE3Y?si=HA6_CuHiUA4yudT9 title="Lebron's first shot" end="5" aspect-ratio="6x3" >}}
-:::
-
-This is the story of how LeBron’s shot selection evolved, and what it reveals about the NBA’s metamorphosis.
-
-```{r}
-
+```{r warning=FALSE, message=FALSE}
 # Generate's Lebron's slope chart with the slope chart generating function created
 base_lebron_slope_chart <- shots_game_by_game_slope_chart(all_shots,"LeBron James",20031029,20231029)
 
@@ -105,10 +102,19 @@ base_lebron_slope_chart +
     plot.subtitle = element_text(size = 10)
   )
 ```
+:::
 
-# 2003-2008: Living in the paint
+...
 
-In his early years, LeBron relied heavily on his unmatched athleticism. Most of his shots came from the paint, where he dominated defenders with explosive drives and finishes at the rim.
+# 2003-2008: The power of playing to your strengths
+
+In LeBron’s early years, the game was simple: get to the basket.
+
+He was faster, stronger, and more athletic than anyone on the court. Why take a risky three-pointer when you could bulldoze your way to the rim? Over 40% of his shots came from the paint, where he was nearly unstoppable.
+
+The mid-range jumper - like the one he made in his first game - was his secondary weapon. And it worked because it fit the league’s style. Coaches weren’t chasing efficiency metrics yet. The paint and mid-range were where championships were won.
+
+LeBron wasn’t just playing basketball. He was thriving in a system built for players like him. The lesson? Success often comes from maximizing what works in the moment, even if it won’t last forever.
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
@@ -134,13 +140,17 @@ lebron_linechart_03_08_v2 <- base_lebron_linechart_03_08 +
 
 ```
 
-![LeBron's shot choices (2003-08)](assets/lebron_linechart_03_08_v2.gif)
+![LeBron's shot choices (2003-08) : Over 40% of LeBron’s shots came from the paint, with mid-range jumpers making up the second-largest proportion. Threes were an afterthought, comprising less than 15% of his attempts.](assets/lebron_linechart_03_08_v2.gif)
 
-Between 2003 and 2008, over **40% of LeBron’s shots came from the paint**, with mid-range jumpers making up the second-largest proportion. **Threes were an afterthought**, comprising less than 15% of his attempts.
+# 2009-2015: Learning to adapt
 
-# 2009-2015: Expanding the arsenal
+By 2009, the NBA was changing. The three-point revolution, sparked by analytics and players like Stephen Curry, was underway. LeBron noticed.
 
-As LeBron’s game matured, so did his shooting repertoire. His time in Miami (2010–2014) marked a critical turning point. Working alongside sharpshooters like Ray Allen and under the analytical tutelage of Erik Spoelstra, LeBron began integrating the three-point shot into his arsenal
+He didn’t immediately abandon the mid-range game - it was still part of his identity - but he started taking more three-pointers. Slowly, deliberately, he added them to his repertoire. By the time he joined the Miami Heat in 2010, and with the influence of teammates like Ray Allen who joined the Heat in 2012, his three-point attempts had grown to 25% of his total shots.
+
+This wasn’t just about skill development. It was about survival. The game was evolving, and players who clung to the old ways risked falling behind.
+
+LeBron’s willingness to adapt showed a crucial insight: the best performers don’t just play their game -they adjust to the rules as they change.
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 base_lebron_linechart_09_15 <- create_linechart(all_shots,"LeBron James",2009,2015)
@@ -162,21 +172,19 @@ lebron_linechart_09_15_v2 <- base_lebron_linechart_09_15 +
 
 ```
 
-![Lebron's shot choices (2009-15)](assets/lebron_linechart_09_15_v2.gif)
+![Lebron's shot choices (2009-15) : Three-point attempts grew from 15% to 25% of his total shots. You can see the drastic change between 2012 and 2013 - the years he won 2 championships, back to back.](assets/lebron_linechart_09_15_v2.gif)
 
-From 2009 to 2015:
+# 2016-2024: Embracing the new reality
 
--   Three-point attempts grew from 15% to 25% of his total shots. You can see the drastic change from 2012 (the year he won his 1st championship)
+The modern NBA belongs to the three-pointer, and so does LeBron.
 
--   Mid-range shots declined to less than 30%.
+Between 2016 and 2023, over 35% of his shots came from beyond the arc. The mid-range? Almost gone. The paint? Still important, but less dominant than before.
 
--   LeBron still attacked the paint though (dunks et. al), with those shots accounting for over 45%
+This wasn’t a concession—it was a strategy. LeBron didn’t stop attacking the basket. He just became more selective, choosing to drive when it mattered most and saving his energy for long-range daggers.
 
-This shift mirrored broader trends in the league, as teams embraced analytics that favored high-value shots—threes and attempts at the rim .
+The league had fully transitioned to an era of spacing and efficiency. Teams weren’t just tolerating three-pointers—they were building offenses around them. LeBron’s game evolved accordingly.
 
-# 2016-2024: The 3PT Era
-
-The modern NBA is a three-point shooter’s paradise, and even LeBron has adapted. Between 2016 and 2023, three-point shots accounted for over 35% of his attempts, a career-high. The paint remains his second home, but the mid-range has largely disappeared
+The takeaway here is simple: the ability to change isn’t a weakness. It’s a competitive advantage
 
 ```{r warning=FALSE, message=FALSE, include=FALSE,output=FALSE}
 
@@ -200,9 +208,9 @@ anim_save("./assets/lebron_linechart_16_24_v2.gif", lebron_linechart_16_24_v2)
 
 ```
 
-![LeBron's shot choices (2016-2024)](assets/lebron_linechart_16_24_v2.gif)
+![LeBron's shot choices (2016-2024) : The shift isn't just about LeBron. The NBA's average number of three-point attempts per game has more than doubled since his rookie year. The league has transitioned from a post-centric style to a perimeter-oriented game](assets/lebron_linechart_16_24_v2.gif)
 
-The shift isn't just about LeBron. The NBA's average number of three-point attempts per game has more than doubled since his rookie year. The league has transitioned from a post-centric style to a perimeter-oriented game.
+.
 
 # Lebron as a mirror to the NBA
 
